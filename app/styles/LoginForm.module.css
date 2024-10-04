@@ -64,6 +64,12 @@
 	background-color: #36a420;
 }
 
+.loginButtonDisabled {
+	background-color: #e1e4e8;
+	color: #8b949e;
+	cursor: pointer;
+}
+
 .register {
 	margin-top: 1rem;
 	text-align: center;

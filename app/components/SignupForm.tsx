@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styles from '../styles/SignupForm.module.css';
+import { useRouter } from 'next/navigation';
+import { setToken } from '../../utils/auth';
 
 const SignupForm = () => {
 	const [name, setName] = useState('');
@@ -7,6 +9,7 @@ const SignupForm = () => {
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [error, setError] = useState('');
+	const router = useRouter();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -23,12 +26,13 @@ const SignupForm = () => {
 				body: JSON.stringify({ name, email, password }),
 			});
 
+			const data = await response.json();
 			if (!response.ok) {
-				const data = await response.json();
 				responseStatus = response.status;
 				throw new Error(data.error);
 			} else {
-				console.log("ok")
+				setToken(data.token);
+				router.push('/');
 			}
 
 			// Clear the form

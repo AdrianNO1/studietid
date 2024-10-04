@@ -8,14 +8,19 @@ const LoginForm = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState('');
+	const [loggingIn, setLoggingIn] = useState(false);
 	const router = useRouter();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		setLoggingIn(true);
 		setError('');
+
+		let routing = false;
 	
 		if (!email || !password) {
 			setError('Please enter both email and password');
+			setLoggingIn(false);
 			return;
 		}
 	
@@ -40,6 +45,7 @@ const LoginForm = () => {
 				if (data.token) {
 					setToken(data.token);
 					router.push('/');
+					routing = true;
 				} else {
 					setError('An error occurred during login. Please try again.');
 				}
@@ -48,8 +54,11 @@ const LoginForm = () => {
 		} catch (error) {
 			setError('An error occurred during login. Please try again.');
 			console.error('Error:', error);
+		} finally {
+			if (!routing) {
+				setLoggingIn(false);
+			}
 		}
-	
 	};
 
 	return (
@@ -78,7 +87,7 @@ const LoginForm = () => {
 						required
 					/>
 				</div>
-				<button type="submit" className={styles.loginButton}>
+				<button type="submit" disabled={loggingIn} className={`${styles.loginButton} ${loggingIn ? styles.loginButtonDisabled : ''}`}>
 					Logg inn
 				</button>
 			</form>

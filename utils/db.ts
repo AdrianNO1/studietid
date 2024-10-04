@@ -1,20 +1,11 @@
 // lib/db.ts
 import Database from 'better-sqlite3';
 
-const db = new Database('./db.sqlite', { verbose: console.log });
+const db = new Database('./db.sqlite', { });
 
-// Create table if it doesn't exist
-db.exec(`
-	CREATE TABLE IF NOT EXISTS Users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT,
-		email TEXT,
-		password TEXT,
-		salt TEXT,
-		token TEXT,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-	)
-`);
+// read from initdb.sql and execute the commands
+const initDb = require('fs').readFileSync('./sql/initdb.sql', 'utf-8');
+db.exec(initDb);
 
 // Add the new column if it doesn't exist
 // db.exec(`

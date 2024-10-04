@@ -1,18 +1,19 @@
 'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { getToken, removeToken } from '../utils/auth';
+import Authenticating from './components/Authenticating';
 
 export default function AuthWrapper({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
+	const pathName = usePathname();
+	const publicPaths = ['/login', '/register'];
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	useEffect(() => {
 		const validateToken = async () => {
 			const token = getToken();
-			console.log('TokenHH:', token);
-
-			const publicPaths = ['/login', '/register'];
+			let redirected = false;
 
 			if (token && !publicPaths.includes(window.location.pathname)) {
 				try {
@@ -31,19 +32,26 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
 					if (!data.isvalid) {
 						removeToken();
 						router.push('/login');
+						redirected = true;
 					}
 				} catch (error) {
 					console.error('Token validation error:', error);
 					removeToken();
 					router.push('/login');
+					redirected = true;
 				}
 			} else if (!publicPaths.includes(window.location.pathname)) {
 				router.push('/login');
+				redirected = true;
+			}
+
+			if (!redirected) {
+				setIsLoggedIn(true);
 			}
 		};
 
 		validateToken();
-	}, [router]);
+	}, [router, pathName]);
 
-	return <>{children}</>;
+	return <>{isLoggedIn ? children : <Authenticating></Authenticating>}</>;
 }

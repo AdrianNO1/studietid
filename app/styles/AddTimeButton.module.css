@@ -1,0 +1,15 @@
+.addTimeButton {
+    background-color: #9b59b6;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .addTimeButton:hover {
+    background-color: #8e44ad;
+  }
+  
