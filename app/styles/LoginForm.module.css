@@ -1,0 +1,90 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	background-color: #f0f2f5;
+	font-family: Arial, sans-serif;
+}
+
+.title {
+	font-size: 3rem;
+	color: #1877f2;
+	margin-bottom: 2rem;
+}
+
+.form {
+	background-color: white;
+	padding: 2rem;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+	width: 100%;
+	max-width: 400px;
+}
+
+.subtitle {
+	font-size: 1.5rem;
+	margin-bottom: 1.5rem;
+	text-align: center;
+}
+
+.inputGroup {
+	margin-bottom: 1rem;
+}
+
+.inputGroup label {
+	display: block;
+	margin-bottom: 0.5rem;
+	font-weight: bold;
+}
+
+.inputGroup input {
+	width: 100%;
+	padding: 0.5rem;
+	font-size: 1rem;
+	border: 1px solid #dddfe2;
+	border-radius: 6px;
+}
+
+.loginButton {
+	width: 100%;
+	padding: 0.75rem;
+	background-color: #42b72a;
+	color: white;
+	font-size: 1.1rem;
+	font-weight: bold;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.loginButton:hover {
+	background-color: #36a420;
+}
+
+.register {
+	margin-top: 1rem;
+	text-align: center;
+}
+
+.register a {
+	color: #1877f2;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.register a:hover {
+	text-decoration: underline;
+}
+
+.error {
+	color: #ff3860;
+	background-color: #feecf0;
+	border: 1px solid #ff3860;
+	border-radius: 4px;
+	padding: 0.5rem;
+	margin-bottom: 1rem;
+	text-align: center;
+}

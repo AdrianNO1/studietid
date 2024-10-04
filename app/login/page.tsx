@@ -1,0 +1,11 @@
+"use client"
+import React from 'react';
+import LoginForm from '../components/LoginForm';
+
+const LoginPage: React.FC = () => {
+	return (
+		<><LoginForm></LoginForm></>
+	);
+};
+
+export default LoginPage;
