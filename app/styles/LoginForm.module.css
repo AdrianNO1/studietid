@@ -30,22 +30,24 @@
 }
 
 .inputGroup {
-	margin-bottom: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
 }
 
 .inputGroup label {
-	display: block;
-	margin-bottom: 0.5rem;
-	font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
 }
 
 .inputGroup input {
-	width: 100%;
-	padding: 0.5rem;
-	font-size: 1rem;
-	border: 1px solid #dddfe2;
-	border-radius: 6px;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
 }
+
 
 .loginButton {
 	width: 100%;
@@ -94,3 +96,4 @@
 	margin-bottom: 1rem;
 	text-align: center;
 }
+

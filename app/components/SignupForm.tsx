@@ -8,6 +8,7 @@ const SignupForm = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
+	const [isAdmin, setIsAdmin] = useState(false);
 	const [error, setError] = useState('');
 	const router = useRouter();
 
@@ -23,7 +24,7 @@ const SignupForm = () => {
 			const response = await fetch('/api/signup', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, email, password }),
+				body: JSON.stringify({ name, email, password, isAdmin }),
 			});
 
 			const data = await response.json();
@@ -40,6 +41,7 @@ const SignupForm = () => {
 			setEmail('');
 			setPassword('');
 			setConfirmPassword('');
+			setIsAdmin(false);
 			setError('');
 		} catch (error: any) {
 			console.log(error)
@@ -97,6 +99,15 @@ const SignupForm = () => {
 						onChange={(e) => setConfirmPassword(e.target.value)}
 						required
 					/>
+				</div>
+				<div className={styles.inputGroup}>
+					<input
+						type="checkbox"
+						id="isAdmin"
+						checked={isAdmin}
+						onChange={(e) => setIsAdmin(e.target.checked)}
+					/>
+					<label htmlFor="isAdmin">Er du administrator?</label>
 				</div>
 				<button type="submit" className={styles.signupButton}>
 					Registrer

@@ -41,7 +41,6 @@ const LoginForm = () => {
 			}
 			else {
 				const data = await response.json();
-				console.log(data);
 				if (data.token) {
 					setToken(data.token);
 					router.push('/');

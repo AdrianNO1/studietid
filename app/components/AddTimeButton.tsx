@@ -12,12 +12,14 @@ interface TimeEntry {
 }
 
 interface Props {
-	studyData: any[];
-	roomData: any[];
-	subjectData: any[];
+	data: {
+		studyData: any[];
+		roomData: any[];
+		subjectData: any[];
+	}
 }
 
-const AddTimeButton: React.FC<Props> = ({studyData, roomData, subjectData}) => {
+const AddTimeButton: React.FC<Props> = ({data}) => {
 	const [isSettingTime, setIsSettingTime] = useState(false);
 
 	const addTime = () => {
@@ -31,12 +33,12 @@ const AddTimeButton: React.FC<Props> = ({studyData, roomData, subjectData}) => {
 	const onSubmit = async (a: TimeEntry) => {
 		const token = getToken();
 		try {
-			const response = await fetch('/api/new-study', {
+			const response = await fetch('/api/update-study', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ token, ...a }),
+				body: JSON.stringify({ token, mode: "add", ...a }),
 			});
 			const data = await response.json();
 			if (response.status !== 200) {
@@ -54,7 +56,7 @@ const AddTimeButton: React.FC<Props> = ({studyData, roomData, subjectData}) => {
 			<button className={styles.addTimeButton} onClick={addTime}>
 				+ Time
 			</button>
-			<AddTimeModal isOpen={isSettingTime} onClose={onClose} onSubmit={onSubmit} studyData={studyData} roomData={roomData} subjectData={subjectData} />
+			<AddTimeModal isOpen={isSettingTime} onClose={onClose} onSubmit={onSubmit} data={data} mode={"add"} />
 		</>
 	);
 };

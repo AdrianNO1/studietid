@@ -9,6 +9,8 @@ type Data = {
     room: number,
     startTime: Date,
     duration: number,
+    mode: "add" | "edit" | "delete",
+    id?: number
 }
 
 export default async function handler(
@@ -20,7 +22,8 @@ export default async function handler(
             res.status(400).json({ error: 'No body provided' })
             return
         }
-        if (req.body.token === undefined || req.body.subject === undefined || req.body.room === undefined || req.body.startTime === undefined || req.body.duration === undefined) {
+
+        if (req.body.token === undefined || ((req.body.subject === undefined || req.body.room === undefined || req.body.startTime === undefined || req.body.duration === undefined) && req.body.mode !== "delete")) {
             let missingParam = ''
             if (req.body.token === undefined) missingParam = 'token'
             else if (req.body.subject === undefined) missingParam = 'subject'
@@ -31,21 +34,18 @@ export default async function handler(
             return
         }
 
-        const { token, subject, room, startTime, duration } = req.body as Data
-
-        console.log("Token: ", token)
-        console.log("Subject: ", subject)
-        console.log("Room: ", room)
-        console.log("Start time: ", startTime)
-        console.log("Duration: ", duration)
+        if ((req.body.mode === "edit" || req.body.mode === "delete") && req.body.id === undefined) {
+            res.status(400).json({ error: 'Missing parameter: id' })
+            return
+        }
+        
+        const { token, subject, room, startTime, duration, mode, id } = req.body as Data
 
         const user = db.prepare('SELECT * FROM Users WHERE token = ?').get(token) as { name: string, email: string, id: number } | undefined | null
         if (!user) {
             res.status(401).json({ error: 'Invalid token' })
             return
         }
-
-        console.log("Database tables:", db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all());
 
         // Check if the subject and room exists and get their ids
         const subjectRow = db.prepare('SELECT id, subjectnavn FROM Subjects WHERE subjectnavn = ?').get(subject) as { id: number, subjectnavn: string } | undefined | null
@@ -67,10 +67,31 @@ export default async function handler(
         //    return
         //}
 
-        // Insert the new study time
-        const stmt = db.prepare('INSERT INTO Studietid (bruker_id, subject_id, rom_id, datetime, timer, status) VALUES (?, ?, ?, ?, ?, ?)')
-        stmt.run(user.id, subjectRow.id, roomRow.id, startTime, duration, 'venter på godkjenning')
+        if (mode === "add") {
+            const stmt = db.prepare('INSERT INTO Studietid (bruker_id, subject_id, rom_id, datetime, timer, status) VALUES (?, ?, ?, ?, ?, ?)')
+            stmt.run(user.id, subjectRow.id, roomRow.id, startTime, duration, 'venter på godkjenning')
+        } else if (mode === "edit" || mode === "delete") {
+            const studyTime = db.prepare('SELECT * FROM Studietid WHERE id = ?').get(id) as { id: number, status: string } | undefined | null
+            if (!studyTime) {
+                res.status(400).json({ error: 'Invalid id' })
+                return
+            }
 
+            if (studyTime.status !== "venter på godkjenning") {
+                res.status(400).json({ error: 'Study time is not pending approval' })
+                return
+            }
+            if (mode === "delete") {
+                const stmt = db.prepare('DELETE FROM Studietid WHERE id = ?')
+                stmt.run(id)
+            } else {
+                const stmt = db.prepare('UPDATE Studietid SET subject_id = ?, rom_id = ?, datetime = ?, timer = ? WHERE id = ?')
+                stmt.run(subjectRow.id, roomRow.id, startTime, duration, id)
+            }
+        } else {
+            res.status(400).json({ error: 'Invalid mode' })
+            return
+        }
 
         res.status(200).json({ success: true })
     } else {

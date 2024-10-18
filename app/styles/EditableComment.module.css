@@ -1,0 +1,46 @@
+.container {
+	position: relative;
+	width: 100%;
+	display: flex;
+}
+
+.textArea {
+	width: 100%;
+	padding: 10px;
+	padding-right: 54px;
+	resize: vertical;
+	min-height: 30px;
+	resize: none;
+	border-radius: 4px;
+}
+
+.button {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+}
+
+.editButton {
+	color: black;
+}
+
+.checkButton {
+	color: black;
+}
+
+.waitingButton {
+	color: black;
+}
+
+.errorButton {
+	color: rgb(205, 0, 0);
+}

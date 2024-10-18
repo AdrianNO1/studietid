@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS Users (
     password TEXT,
     salt TEXT,
     token TEXT,
+    isAdmin INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -28,7 +29,7 @@ CREATE TABLE IF NOT EXISTS Studietid (
     datetime DATE NOT NULL,
     timer INTEGER NOT NULL,
     status TEXT NOT NULL CHECK(status IN ('venter på godkjenning', 'godkjent', 'avvist')),
-    kommentar TEXT,
+    kommentar TEXT NOT NULL DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (bruker_id) REFERENCES Users(id),
     FOREIGN KEY (subject_id) REFERENCES Subjects(id),

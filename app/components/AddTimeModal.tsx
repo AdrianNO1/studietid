@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import styles from '../styles/AddTimeModal.module.css';
 import { useEffect, useRef } from 'react';
 
@@ -6,27 +6,59 @@ interface AddTimeModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onSubmit: (entry: TimeEntry) => void;
-	studyData: any[];
-	roomData: any[];
-	subjectData: any[];
+	mode: "add" | "edit";
+	data: {
+		studyData: any[];
+		roomData: any[];
+		subjectData: any[];
+	};
+	editData?: {
+		id: number;
+		subject: string;
+		time: string;
+		room: string;
+		status: "venter på godkjenning" | "godkjent" | "avvist";
+		comment: string;
+		timer: number;
+	} | null;
 }
 
 interface TimeEntry {
+	id?: number;
 	subject: string;
 	room: string;
 	startTime: string;
 	duration: number;
+	delete?: boolean;
 }
 
-const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, studyData, roomData, subjectData }) => {
-	const [subject, setSubject] = useState('');
-	const [room, setRoom] = useState('');
-	const [startTime, setStartTime] = useState('');
-	const [duration, setDuration] = useState(1);
+const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, data, mode, editData }) => {
+	const [subject, setSubject] = useState(editData?.subject || '');
+	const [room, setRoom] = useState(editData?.room || '');
+	const [startTime, setStartTime] = useState(editData?.time || '');
+	const [duration, setDuration] = useState(editData?.timer || 1);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	useEffect(() => {
+		if (editData) {
+			setSubject(editData.subject);
+			setRoom(editData.room);
+			setStartTime(editData.time);
+			setDuration(editData.timer);
+		}
+	}, [editData]);
+
+	const { studyData, roomData, subjectData } = data;
+
+	const handleSubmit = (e: React.FormEvent, deleteTime?: boolean) => {
 		e.preventDefault();
-		onSubmit({ subject, room, startTime, duration });
+		let data = { subject, room, startTime, duration } as TimeEntry;
+		if (mode === 'edit') {
+			data = { ...data, id: editData?.id }
+		}
+		if (deleteTime) {
+			data = { ...data, delete: true }
+		}
+		onSubmit(data);
 		onClose();
 	};
 
@@ -53,7 +85,7 @@ const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, 
 	return (
 		<div className={styles.modalOverlay}>
 			<div className={styles.modalContent} ref={modalRef}>
-				<h2>Legg til ny time</h2>
+			<h2>{mode === 'add' ? "Legg til ny time" : "Rediger time"}</h2>
 				<form onSubmit={handleSubmit}>
 					<div className={styles.formGroup}>
 						<label htmlFor="subject">Subject:</label>
@@ -65,7 +97,6 @@ const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, 
 						>
 							<option value="">Velg Subject</option>
 							{subjectData ? subjectData.map((s: any) => (
-								console.log(s.subjectname),
 								<option key={s.subjectname} value={s.subjectname}>
 									{s.subjectname}
 								</option>
@@ -110,12 +141,21 @@ const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, 
 							<option value={2}>2 timer</option>
 						</select>
 					</div>
+					{mode === "edit" && (
+						<button
+							type="button"
+							className={styles.deleteButton}
+							onClick={(e) => handleSubmit(e, true)}
+						>
+							Kanseller time
+						</button>
+					)}
 					<div className={styles.buttonGroup}>
 						<button type="button" onClick={onClose} className={styles.cancelButton}>
 							Avbryt
 						</button>
 						<button type="submit" className={styles.submitButton}>
-							Legg til
+							{mode === 'add' ? 'Legg til' : 'Rediger'}
 						</button>
 					</div>
 				</form>

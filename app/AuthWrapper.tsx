@@ -3,18 +3,21 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { getToken, removeToken } from '../utils/auth';
 import Authenticating from './components/Authenticating';
+import { AuthContext } from './AuthContext';
 
 export default function AuthWrapper({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
 	const pathName = usePathname();
 	const publicPaths = ['/login', '/register'];
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [isAdmin, setIsAdmin] = useState(null);
 
 	useEffect(() => {
 		const validateToken = async () => {
 			const token = getToken();
 			let redirected = false;
 
+			let responseData = null;
 			if (token && !publicPaths.includes(window.location.pathname)) {
 				try {
 					const response = await fetch('/api/validate-token', {
@@ -24,12 +27,12 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
 						},
 						body: JSON.stringify({ token }),
 					});
-					const data = await response.json();
+					responseData = await response.json();
 					if (response.status !== 200) {
-						throw new Error(data.error);
+						throw new Error(responseData.error);
 					}
 
-					if (!data.isvalid) {
+					if (!responseData.isvalid) {
 						removeToken();
 						router.push('/login');
 						redirected = true;
@@ -47,11 +50,19 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
 
 			if (!redirected) {
 				setIsLoggedIn(true);
+				if (responseData) {
+					setIsAdmin(responseData.isAdmin);
+				}
 			}
 		};
 
 		validateToken();
 	}, [router, pathName]);
 
-	return <>{isLoggedIn ? children : <Authenticating></Authenticating>}</>;
+	return (
+		<AuthContext.Provider value={{ isAdmin }}>
+			{isLoggedIn ? children : <Authenticating></Authenticating>}
+		</AuthContext.Provider>
+	);
+	
 }

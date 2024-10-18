@@ -23,10 +23,11 @@ export default async function handler(
 
         const { token } = req.body as Data
 
-        const user = db.prepare('SELECT * FROM Users WHERE token = ?').get(token)
+        const user = db.prepare('SELECT * FROM Users WHERE token = ?').get(token) as { name: string, email: string, id: number, isAdmin: number } | undefined | null
         let isvalid = user ? true : false
+        let isAdmin = user && user.isAdmin
 
-        res.status(200).json({ isvalid })
+        res.status(200).json({ isvalid, isAdmin })
     } else {
         res.status(405).json({ error: 'Method Not Allowed' })
     }
