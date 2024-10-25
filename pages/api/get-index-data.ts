@@ -48,7 +48,7 @@ export default async function handler(
                 Subjects ON Studietid.subject_id = Subjects.id
             JOIN
                 Users ON Studietid.bruker_id = Users.id
-            `).all() as { room: string, time: string, comment: string, subject: string, timer: number, status: string, id: number, person: string }[]
+            `).all() as { room: string, time: Date, comment: string, subject: string, timer: number, status: string, id: number, person: string }[]
                 
             res.status(200).json({ name, studietider })
         } else {
@@ -68,7 +68,7 @@ export default async function handler(
                 Subjects ON Studietid.subject_id = Subjects.id
             WHERE 
                 Studietid.bruker_id = ?;
-            `).all(user.id) as { room: string, time: string, comment: string, subject: string, timer: number, status: string, id: number}[]
+            `).all(user.id) as { room: string, time: Date, comment: string, subject: string, timer: number, status: string, id: number}[]
     
             studietider.forEach(studietid => {
                 if (studietid.status === "venter på godkjenning") {

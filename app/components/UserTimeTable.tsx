@@ -6,7 +6,7 @@ import { getToken } from '../../utils/auth';
 interface TimeEntry {
     id: number;
     subject: string;
-    time: string;
+    time: Date;
     room: string;
     status: "venter på godkjenning" | "godkjent" | "avvist";
     comment: string;
@@ -17,7 +17,7 @@ interface SubmitTimeEntry {
 	id?: number;
 	subject: string;
 	room: string;
-	startTime: string;
+	startDateTime: Date;
 	duration: number;
     delete?: boolean;
 }
@@ -41,16 +41,26 @@ const UserTimeTable: React.FC<TimeTableProps> = ({ entries, data }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<TimeEntry | null>(null);
 
-    const formatTimeRange = (startTime: string, duration: number): string => {
-        const [hours, minutes] = startTime.split(':').map(Number);
+    const formatTimeRange = (startTime: Date, duration: number): JSX.Element => {
+        if (typeof startTime === 'string') {
+            startTime = new Date(startTime);
+        }
+        const [hours, minutes] = startTime.toTimeString().split(':').map(Number);
         const startDate = new Date(2023, 0, 1, hours, minutes);
         const endDate = new Date(startDate.getTime() + duration * 60 * 60 * 1000);
+
+        const regularDate = startTime.toISOString().split('T')[0];
         
         const formatTime = (date: Date) => {
             return date.toTimeString().slice(0, 5);
         };
 
-        return `${formatTime(startDate)} - ${formatTime(endDate)}`;
+        return (
+            <>
+                <div>{regularDate}</div>
+                <div>{`${formatTime(startDate)} - ${formatTime(endDate)}`}</div>
+            </>
+        )
     };
 
     const editSubject = (entry: TimeEntry) => {
@@ -103,7 +113,6 @@ const UserTimeTable: React.FC<TimeTableProps> = ({ entries, data }) => {
                         <th>Tid</th>
                         <th>Rom</th>
                         <th>Status</th>
-                        <th>Id</th>
                         <th>Kommentar</th>
                     </tr>
                 </thead>
@@ -114,7 +123,6 @@ const UserTimeTable: React.FC<TimeTableProps> = ({ entries, data }) => {
                             <td>{formatTimeRange(entry.time, entry.timer)}</td>
                             <td>{entry.room}</td>
                             <td className={statusClasses[entry.status]}>{entry.status}</td>
-                            <td>{entry.id}</td>
                             {entry.status === "venter på godkjenning" ? <EditButton entry={entry}></EditButton> : <td>{entry.comment}</td>}
                         </tr>
                     )) : <tr><td colSpan={6}>Du har ingen studietimer</td></tr>}

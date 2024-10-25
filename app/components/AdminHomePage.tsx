@@ -11,7 +11,7 @@ interface TimeEntry {
 	id: number;
 	person: string;
 	subject: string;
-	time: string;
+	time: Date;
 	room: string;
     status: "venter på godkjenning" | "godkjent" | "avvist";
 	comment: string;
@@ -59,7 +59,7 @@ const AdminHomePage: React.FC = () => {
             <Header name={name} />
             <main className={styles.main}>
                 <div className={styles.tableHeader}>
-                    <h2>Studietimer add</h2>
+                    <h2>Studietimer Admin</h2>
                 </div>
                 <AdminTimeTable entries={studyData}/>
             </main>

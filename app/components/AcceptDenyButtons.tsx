@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from '../styles/AcceptDenyButtons.module.css';
 
 interface AcceptDenyButtonsProps {
@@ -6,38 +6,34 @@ interface AcceptDenyButtonsProps {
 }
 
 const AcceptDenyButtons: React.FC<AcceptDenyButtonsProps> = ({ onSubmit }) => {
-	const setStatus = (status: boolean) => {
-		if (status) {
-			
-		} else {
-			alert('Noe gikk galt. Vennligst prøv igjen.');
-			setButtonsEnabled(true);
-		}
-	}
+	const [buttonsEnabled, setButtonsEnabled] = useState(true);
 
-	const setButtonsEnabled = (enabled: boolean) => {
-		const buttons = document.querySelectorAll(`.${styles.button}`);
-		buttons.forEach(button => {
-			if (enabled) {
-				button.removeAttribute('disabled');
-			} else {
-				button.setAttribute('disabled', 'true');
-			}
-		});
+	const setStatus = (status: boolean) => {
+		if (!status) {
+			alert('Noe gikk galt. Vennligst prøv igjen.');
+		}
+		setButtonsEnabled(true);
 	}
 
 	const handleSubmit = (accepted: boolean) => {
-		console.log('Submitting');
 		setButtonsEnabled(false);
 		onSubmit(accepted, setStatus);
 	}
 
 	return (
 		<div className={styles.acceptDenyButtons}>
-			<button className={`${styles.button} ${styles.accept}`} onClick={() => handleSubmit(true)}>
+			<button 
+				className={`${styles.button} ${styles.accept}`} 
+				onClick={() => handleSubmit(true)} 
+				disabled={!buttonsEnabled}
+			>
 				Godkjenn
 			</button>
-			<button className={`${styles.button} ${styles.deny}`} onClick={() => handleSubmit(false)}>
+			<button 
+				className={`${styles.button} ${styles.deny}`} 
+				onClick={() => handleSubmit(false)} 
+				disabled={!buttonsEnabled}
+			>
 				Avvis
 			</button>
 		</div>

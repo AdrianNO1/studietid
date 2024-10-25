@@ -65,7 +65,7 @@ const EditableTextArea: React.FC<EditableTextAreaProps> = ({ defaultText, onSubm
 			<textarea
 				ref={textAreaRef}
 				className={styles.textArea}
-				value={text}
+				value={text || ''}
 				placeholder='Skriv en kommentar...'
 				onChange={(e) => setText(e.target.value)}
 				onFocus={() => setIsEditing(true)}

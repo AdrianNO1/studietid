@@ -7,7 +7,7 @@ type Data = {
     token: string,
     subject: number,
     room: number,
-    startTime: Date,
+    startDateTime: Date,
     duration: number,
     mode: "add" | "edit" | "delete",
     id?: number
@@ -23,12 +23,12 @@ export default async function handler(
             return
         }
 
-        if (req.body.token === undefined || ((req.body.subject === undefined || req.body.room === undefined || req.body.startTime === undefined || req.body.duration === undefined) && req.body.mode !== "delete")) {
+        if (req.body.token === undefined || ((req.body.subject === undefined || req.body.room === undefined || req.body.startDateTime === undefined || req.body.duration === undefined) && req.body.mode !== "delete")) {
             let missingParam = ''
             if (req.body.token === undefined) missingParam = 'token'
             else if (req.body.subject === undefined) missingParam = 'subject'
             else if (req.body.room === undefined) missingParam = 'room'
-            else if (req.body.startTime === undefined) missingParam = 'startTime'
+            else if (req.body.startDateTime === undefined) missingParam = 'startDateTime'
             else if (req.body.duration === undefined) missingParam = 'duration'
             res.status(400).json({ error: `Missing parameter: ${missingParam}` })
             return
@@ -39,7 +39,7 @@ export default async function handler(
             return
         }
         
-        const { token, subject, room, startTime, duration, mode, id } = req.body as Data
+        const { token, subject, room, startDateTime, duration, mode, id } = req.body as Data
 
         const user = db.prepare('SELECT * FROM Users WHERE token = ?').get(token) as { name: string, email: string, id: number } | undefined | null
         if (!user) {
@@ -61,7 +61,7 @@ export default async function handler(
         }
 
         // Check if the user already has a study time at the same time
-        //const studyTime = db.prepare('SELECT * FROM Studietid WHERE bruker_id = ? AND datetime = ?').get(user.id, startTime) as { id: number, datetime: string } | undefined | null
+        //const studyTime = db.prepare('SELECT * FROM Studietid WHERE bruker_id = ? AND datetime = ?').get(user.id, startDateTime) as { id: number, datetime: string } | undefined | null
         //if (studyTime) {
         //    res.status(400).json({ error: 'User already has a study time at the same time' })
         //    return
@@ -69,7 +69,7 @@ export default async function handler(
 
         if (mode === "add") {
             const stmt = db.prepare('INSERT INTO Studietid (bruker_id, subject_id, rom_id, datetime, timer, status) VALUES (?, ?, ?, ?, ?, ?)')
-            stmt.run(user.id, subjectRow.id, roomRow.id, startTime, duration, 'venter på godkjenning')
+            stmt.run(user.id, subjectRow.id, roomRow.id, startDateTime, duration, 'venter på godkjenning')
         } else if (mode === "edit" || mode === "delete") {
             const studyTime = db.prepare('SELECT * FROM Studietid WHERE id = ?').get(id) as { id: number, status: string } | undefined | null
             if (!studyTime) {
@@ -86,7 +86,7 @@ export default async function handler(
                 stmt.run(id)
             } else {
                 const stmt = db.prepare('UPDATE Studietid SET subject_id = ?, rom_id = ?, datetime = ?, timer = ? WHERE id = ?')
-                stmt.run(subjectRow.id, roomRow.id, startTime, duration, id)
+                stmt.run(subjectRow.id, roomRow.id, startDateTime, duration, id)
             }
         } else {
             res.status(400).json({ error: 'Invalid mode' })

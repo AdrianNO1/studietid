@@ -7,7 +7,7 @@ import { getToken } from '../../utils/auth';
 interface TimeEntry {
 	subject: string;
 	room: string;
-	startTime: string;
+	startDateTime: Date;
 	duration: number;
 }
 

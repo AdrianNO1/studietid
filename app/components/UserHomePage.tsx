@@ -10,7 +10,7 @@ import { getToken } from '../../utils/auth';
 interface TimeEntry {
 	id: number;
 	subject: string;
-	time: string;
+	time: Date;
 	room: string;
     status: "venter på godkjenning" | "godkjent" | "avvist";
 	comment: string;
@@ -34,7 +34,7 @@ const UserHomePage: React.FC = () => {
 					},
 					body: JSON.stringify({ token: getToken() }),
 				});
-			
+
 				if (!response.ok) {
 					const data = await response.json()
 					console.log(data)

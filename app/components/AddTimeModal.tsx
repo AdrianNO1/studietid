@@ -15,7 +15,7 @@ interface AddTimeModalProps {
 	editData?: {
 		id: number;
 		subject: string;
-		time: string;
+		time: Date;
 		room: string;
 		status: "venter på godkjenning" | "godkjent" | "avvist";
 		comment: string;
@@ -27,7 +27,7 @@ interface TimeEntry {
 	id?: number;
 	subject: string;
 	room: string;
-	startTime: string;
+	startDateTime: Date;
 	duration: number;
 	delete?: boolean;
 }
@@ -35,14 +35,21 @@ interface TimeEntry {
 const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, data, mode, editData }) => {
 	const [subject, setSubject] = useState(editData?.subject || '');
 	const [room, setRoom] = useState(editData?.room || '');
-	const [startTime, setStartTime] = useState(editData?.time || '');
+	const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+	const [startTime, setStartTime] = useState(typeof editData?.time === 'string' ? editData.time : editData?.time.toTimeString().slice(0, 5) || '00:00');
 	const [duration, setDuration] = useState(editData?.timer || 1);
 
 	useEffect(() => {
 		if (editData) {
 			setSubject(editData.subject);
 			setRoom(editData.room);
-			setStartTime(editData.time);
+			if (typeof (editData.time as unknown as string) === 'string') {
+				setStartDate((editData.time as unknown  as string).split('T')[0]);
+				setStartTime((editData.time as unknown  as string).split('T')[1].slice(0, 5));
+			} else {
+				setStartDate(editData.time.toISOString().split('T')[0]);
+				setStartTime(editData.time.toTimeString().slice(0, 5));
+			}
 			setDuration(editData.timer);
 		}
 	}, [editData]);
@@ -51,7 +58,8 @@ const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, 
 
 	const handleSubmit = (e: React.FormEvent, deleteTime?: boolean) => {
 		e.preventDefault();
-		let data = { subject, room, startTime, duration } as TimeEntry;
+		let startDateTime = new Date(`${startDate}T${startTime}`);
+		let data = { subject, room, startDateTime, duration } as TimeEntry;
 		if (mode === 'edit') {
 			data = { ...data, id: editData?.id }
 		}
@@ -120,7 +128,17 @@ const AddTimeModal: React.FC<AddTimeModalProps> = ({ isOpen, onClose, onSubmit, 
 						</select>
 					</div>
 					<div className={styles.formGroup}>
-						<label htmlFor="startTime">Starttid:</label>
+						<label htmlFor="startDate">Dato:</label>
+						<input
+							type="date"
+							id="startDate"
+							value={startDate}
+							onChange={(e) => setStartDate(e.target.value)}
+							required
+						/>
+					</div>
+					<div className={styles.formGroup}>
+						<label htmlFor="startTime">Tid:</label>
 						<input
 							type="time"
 							id="startTime"

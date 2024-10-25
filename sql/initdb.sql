@@ -11,13 +11,13 @@ CREATE TABLE IF NOT EXISTS Users (
 
 CREATE TABLE IF NOT EXISTS Subjects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    subjectnavn TEXT NOT NULL,
+    subjectnavn TEXT NOT NULL UNIQUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS Rom (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    romnavn TEXT NOT NULL,
+    romnavn TEXT NOT NULL UNIQUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS Studietid (
     datetime DATE NOT NULL,
     timer INTEGER NOT NULL,
     status TEXT NOT NULL CHECK(status IN ('venter på godkjenning', 'godkjent', 'avvist')),
-    kommentar TEXT NOT NULL DEFAULT '',
+    comment TEXT NOT NULL DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (bruker_id) REFERENCES Users(id),
     FOREIGN KEY (subject_id) REFERENCES Subjects(id),
